@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Audio Webhook App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Voice Audio Webhook</h1>
+        
+        <div class="controls">
+            <button id="recordBtn" class="record-btn">
+                <span class="btn-text">Start Recording</span>
+            </button>
+            
+            <div class="webhook-config">
+                <label for="webhookUrl">Webhook URL:</label>
+                <input type="url" id="webhookUrl" placeholder="https://your-webhook-endpoint.com/audio" value="">
+            </div>
+        </div>
+        
+        <div class="status">
+            <div id="status" class="status-text">Ready to record</div>
+            <div id="timer" class="timer">00:00</div>
+        </div>
+        
+        <div class="audio-container">
+            <div class="audio-section">
+                <h3>Recorded Audio</h3>
+                <audio id="recordedAudio" controls style="display: none;"></audio>
+                <div id="recordedStatus" class="audio-status">No recording yet</div>
+            </div>
+            
+            <div class="audio-section">
+                <h3>Response Audio</h3>
+                <audio id="responseAudio" controls style="display: none;"></audio>
+                <div id="responseStatus" class="audio-status">No response yet</div>
+            </div>
+        </div>
+        
+        <div class="error-message" id="errorMessage" style="display: none;"></div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>
