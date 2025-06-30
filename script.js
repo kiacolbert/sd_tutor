@@ -155,7 +155,7 @@ class VoiceWebhookApp {
             this.updateStatus('Sending audio to webhook...');
             
             const formData = new FormData();
-            formData.append('audio', audioBlob, 'recording.' + this.getFileExtension());
+            formData.append('voice_message', audioBlob, 'recording.' + this.getFileExtension());
             formData.append('timestamp', new Date().toISOString());
             
             const response = await fetch(this.webhookUrl.value.trim(), {

@@ -61,7 +61,7 @@ describe('Server API Tests', () => {
       
       const response = await request(app)
         .post('/webhook/test')
-        .attach('audio', audioBuffer, {
+        .attach('voice_message', audioBuffer, {
           filename: 'test.wav',
           contentType: 'audio/wav'
         })
@@ -81,7 +81,7 @@ describe('Server API Tests', () => {
       
       const response = await request(app)
         .post('/webhook/test')
-        .attach('audio', textBuffer, {
+        .attach('voice_message', textBuffer, {
           filename: 'test.txt',
           contentType: 'text/plain'
         });
@@ -97,7 +97,7 @@ describe('Server API Tests', () => {
         .expect(400)
         .expect('Content-Type', /json/);
 
-      expect(response.body).toHaveProperty('error', 'No audio file received');
+      expect(response.body).toHaveProperty('error', 'No voice message received');
     });
 
     test('should handle large file uploads within limit', async () => {
@@ -106,7 +106,7 @@ describe('Server API Tests', () => {
       
       await request(app)
         .post('/webhook/test')
-        .attach('audio', audioBuffer, {
+        .attach('voice_message', audioBuffer, {
           filename: 'large.wav',
           contentType: 'audio/wav'
         })
@@ -119,7 +119,7 @@ describe('Server API Tests', () => {
       
       const response = await request(app)
         .post('/webhook/test')
-        .attach('audio', audioBuffer, {
+        .attach('voice_message', audioBuffer, {
           filename: 'toolarge.wav',
           contentType: 'audio/wav'
         })
@@ -142,7 +142,7 @@ describe('Server API Tests', () => {
         
         await request(app)
           .post('/webhook/test')
-          .attach('audio', audioBuffer, {
+          .attach('voice_message', audioBuffer, {
             filename: `test.${format.ext}`,
             contentType: format.type
           })
@@ -156,7 +156,7 @@ describe('Server API Tests', () => {
       
       const response = await request(app)
         .post('/webhook/test')
-        .attach('audio', audioBuffer, {
+        .attach('voice_message', audioBuffer, {
           filename: 'test.wav',
           contentType: 'audio/wav'
         })
@@ -240,7 +240,7 @@ describe('Server API Tests', () => {
         .post('/webhook/test')
         .field('timestamp', new Date().toISOString())
         .field('customField', 'customValue')
-        .attach('audio', audioBuffer, {
+        .attach('voice_message', audioBuffer, {
           filename: 'test.wav',
           contentType: 'audio/wav'
         })
@@ -252,7 +252,7 @@ describe('Server API Tests', () => {
       
       const response = await request(app)
         .post('/webhook/test')
-        .attach('audio', audioBuffer, 'test.wav');
+        .attach('voice_message', audioBuffer, 'test.wav');
         
       // May pass or fail depending on browser/supertest behavior
       // This test just ensures no server error occurs
@@ -270,7 +270,7 @@ describe('Server API Tests', () => {
         requests.push(
           request(app)
             .post('/webhook/test')
-            .attach('audio', audioBuffer, {
+            .attach('voice_message', audioBuffer, {
               filename: `test${i}.wav`,
               contentType: 'audio/wav'
             })
@@ -293,7 +293,7 @@ describe('Server API Tests', () => {
       
       await request(app)
         .post('/webhook/test')
-        .attach('audio', audioBuffer, {
+        .attach('voice_message', audioBuffer, {
           filename: 'test.wav',
           contentType: 'audio/wav'
         })

@@ -56,7 +56,7 @@ Then open http://localhost:3000
 Your webhook endpoint should:
 
 - Accept `POST` requests
-- Handle `multipart/form-data` with an `audio` field
+- Handle `multipart/form-data` with a `voice_message` field
 - Optionally return audio data with appropriate `Content-Type` header
 - Handle CORS if serving from a different domain
 

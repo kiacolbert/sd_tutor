@@ -34,10 +34,10 @@ app.get('/', (req, res) => {
 });
 
 // Test webhook endpoint for development
-app.post('/webhook/test', upload.single('audio'), (req, res) => {
+app.post('/webhook/test', upload.single('voice_message'), (req, res) => {
     try {
         if (!req.file) {
-            return res.status(400).json({ error: 'No audio file received' });
+            return res.status(400).json({ error: 'No voice message received' });
         }
 
         console.log('Received audio file:', {
