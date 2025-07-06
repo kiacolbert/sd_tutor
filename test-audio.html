@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Response Test</title>
+</head>
+<body>
+    <h1>Audio Response Test</h1>
+    <button id="testBtn">Test Audio Response</button>
+    <audio id="testAudio" controls style="display: none;"></audio>
+    <div id="status">Ready to test</div>
+    
+    <script>
+        document.getElementById('testBtn').addEventListener('click', async () => {
+            const statusDiv = document.getElementById('status');
+            const audioElement = document.getElementById('testAudio');
+            
+            try {
+                statusDiv.textContent = 'Testing audio response...';
+                
+                // Create a simple audio blob for testing
+                const testBlob = new Blob(['test audio data'], { type: 'audio/wav' });
+                const formData = new FormData();
+                formData.append('voice_message', testBlob, 'test.wav');
+                formData.append('timestamp', new Date().toISOString());
+                
+                console.log('🔍 DEBUG: Testing webhook with audio response...');
+                
+                const response = await fetch('http://localhost:3000/webhook/test', {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'audio/*, application/json, text/plain'
+                    }
+                });
+                
+                console.log('🔍 DEBUG: Response status:', response.status);
+                console.log('🔍 DEBUG: Response headers:');
+                for (let [key, value] of response.headers.entries()) {
+                    console.log('  -', key, ':', value);
+                }
+                
+                const contentType = response.headers.get('content-type');
+                console.log('🔍 DEBUG: Content-Type:', contentType);
+                
+                if (contentType && contentType.startsWith('audio/')) {
+                    console.log('🔍 DEBUG: Processing audio response');
+                    const responseBlob = await response.blob();
+                    console.log('🔍 DEBUG: Response blob size:', responseBlob.size, 'bytes');
+                    console.log('🔍 DEBUG: Response blob type:', responseBlob.type);
+                    
+                    const audioUrl = URL.createObjectURL(responseBlob);
+                    audioElement.src = audioUrl;
+                    audioElement.style.display = 'block';
+                    
+                    try {
+                        await audioElement.play();
+                        statusDiv.textContent = 'Audio response playing successfully!';
+                        console.log('🔍 DEBUG: Audio playback started successfully');
+                    } catch (playError) {
+                        statusDiv.textContent = 'Audio received - click play button to hear';
+                        console.log('🔍 DEBUG: Autoplay failed:', playError.message);
+                    }
+                } else {
+                    console.log('🔍 DEBUG: Processing text response');
+                    const responseText = await response.text();
+                    console.log('🔍 DEBUG: Response text:', responseText);
+                    statusDiv.textContent = 'Text response: ' + responseText;
+                }
+                
+            } catch (error) {
+                console.error('🔍 DEBUG: Test error:', error);
+                statusDiv.textContent = 'Error: ' + error.message;
+            }
+        });
+    </script>
+</body>
+</html> 

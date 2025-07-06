@@ -19,10 +19,18 @@ const upload = multer({
         fileSize: 10 * 1024 * 1024 // 10MB limit
     },
     fileFilter: (req, file, cb) => {
-        // Accept audio files
-        if (file.mimetype.startsWith('audio/')) {
+        console.log('🔍 DEBUG: File filter checking:', file.originalname, 'MIME type:', file.mimetype);
+        // Accept audio files (including various audio MIME types)
+        const audioMimeTypes = [
+            'audio/wav', 'audio/x-wav', 'audio/webm', 'audio/mp4', 
+            'audio/mpeg', 'audio/mp3', 'audio/ogg', 'audio/aac', 'audio/flac'
+        ];
+        
+        if (file.mimetype.startsWith('audio/') || audioMimeTypes.includes(file.mimetype)) {
+            console.log('🔍 DEBUG: File accepted');
             cb(null, true);
         } else {
+            console.log('🔍 DEBUG: File rejected - MIME type not supported');
             cb(new Error('Only audio files are allowed!'), false);
         }
     }
@@ -35,12 +43,18 @@ app.get('/', (req, res) => {
 
 // Test webhook endpoint for development
 app.post('/webhook/test', upload.single('voice_message'), (req, res) => {
+    console.log('🔍 DEBUG: Webhook request received');
+    console.log('🔍 DEBUG: Request headers:', req.headers);
+    console.log('🔍 DEBUG: Request body keys:', Object.keys(req.body));
+    console.log('🔍 DEBUG: Request file:', req.file);
+    
     try {
         if (!req.file) {
+            console.log('🔍 DEBUG: No file received in request');
             return res.status(400).json({ error: 'No voice message received' });
         }
 
-        console.log('Received audio file:', {
+        console.log('🔍 DEBUG: Received audio file:', {
             filename: req.file.originalname,
             mimetype: req.file.mimetype,
             size: req.file.size,
@@ -56,27 +70,31 @@ app.post('/webhook/test', upload.single('voice_message'), (req, res) => {
         // For this demo, we'll return a simple audio response
         // You can replace this with actual audio processing logic
         
-        // Send back a simple JSON response for now
-        res.json({
-            success: true,
-            message: 'Audio received successfully',
-            receivedFile: {
-                name: req.file.originalname,
-                size: req.file.size,
-                type: req.file.mimetype
-            },
-            timestamp: new Date().toISOString()
-        });
-
-        // Uncomment below to return an audio file instead
-        // const audioResponsePath = path.join(__dirname, 'sample-response.wav');
-        // if (fs.existsSync(audioResponsePath)) {
-        //     res.set({
-        //         'Content-Type': 'audio/wav',
-        //         'Content-Disposition': 'attachment; filename="response.wav"'
-        //     });
-        //     return res.sendFile(audioResponsePath);
-        // }
+        // Try to return an audio response first, fallback to JSON
+        const audioResponsePath = path.join(__dirname, 'data1.mpga');
+        if (fs.existsSync(audioResponsePath)) {
+            console.log('🔍 DEBUG: Sending audio response (data1.mpga)');
+            res.set({
+                'Content-Type': 'audio/mpeg',
+                'Content-Disposition': 'attachment; filename="response.mp3"'
+            });
+            return res.sendFile(audioResponsePath);
+        } else {
+            // Fallback to JSON response
+            const response = {
+                success: true,
+                message: 'Audio received successfully',
+                receivedFile: {
+                    name: req.file.originalname,
+                    size: req.file.size,
+                    type: req.file.mimetype
+                },
+                timestamp: new Date().toISOString()
+            };
+            
+            console.log('🔍 DEBUG: Sending JSON response:', response);
+            res.json(response);
+        }
 
     } catch (error) {
         console.error('Error processing audio:', error);
@@ -95,10 +113,17 @@ app.get('/health', (req, res) => {
 
 // Error handling middleware
 app.use((error, req, res, next) => {
+    console.error('🔍 DEBUG: Error caught in middleware:', error.message);
+    
     if (error instanceof multer.MulterError) {
         if (error.code === 'LIMIT_FILE_SIZE') {
             return res.status(400).json({ error: 'File too large. Maximum size is 10MB.' });
         }
+    }
+    
+    // Handle multer fileFilter errors
+    if (error.message === 'Only audio files are allowed!') {
+        return res.status(400).json({ error: 'Only audio files are allowed!' });
     }
     
     console.error('Server error:', error);
