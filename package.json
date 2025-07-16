@@ -9,7 +9,8 @@
     "serve": "npx http-server . -p 3000 -c-1",
     "test": "jest",
     "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage"
+    "test:coverage": "jest --coverage",
+    "start:prod": "NODE_ENV=production node server.js"
   },
   "keywords": [
     "voice",
